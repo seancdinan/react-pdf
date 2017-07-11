@@ -7,6 +7,8 @@ PDFJS.workerSrc = require('pdfjs-dist/build/pdf.worker.js');
 
 PDFJS.disableWorker = true;
 
+const isBrowser = typeof window !== 'undefined';
+
 export default class ReactPDF extends Component {
   state = {
     pdf: null,
@@ -371,22 +373,28 @@ ReactPDF.defaultProps = {
   noData: 'No PDF file specified.',
 };
 
+const filePropTypes = [
+  PropTypes.string,
+  PropTypes.shape({
+    data: PropTypes.object,
+    httpHeaders: PropTypes.object,
+    range: PropTypes.object,
+    url: PropTypes.string,
+  }),
+];
+if (isBrowser) {
+  filePropTypes.push(
+    PropTypes.instanceOf(File),
+    PropTypes.instanceOf(Blob),
+  );
+}
+
 ReactPDF.propTypes = {
   error: PropTypes.oneOfType([
     PropTypes.string,
     PropTypes.node,
   ]),
-  file: PropTypes.oneOfType([
-    PropTypes.string,
-    PropTypes.instanceOf(File),
-    PropTypes.instanceOf(Blob),
-    PropTypes.shape({
-      data: PropTypes.object,
-      httpHeaders: PropTypes.object,
-      range: PropTypes.object,
-      url: PropTypes.string,
-    }),
-  ]),
+  file: PropTypes.oneOfType(filePropTypes),
   loading: PropTypes.oneOfType([
     PropTypes.string,
     PropTypes.node,
